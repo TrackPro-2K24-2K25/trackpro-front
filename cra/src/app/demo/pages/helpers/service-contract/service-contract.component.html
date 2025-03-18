@@ -1,0 +1,85 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+<div class="row">
+    <div class="col-sm-12">
+      <app-card cardTitle="Service Contracts Management">
+        <!-- Search Input and Add Button -->
+        <div class="d-flex justify-content-between mb-2">
+            <input type="text" class="form-control me-2" placeholder="Search..." [(ngModel)]="searchTerm" (input)="filterServiceContracts()">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addServiceContractModal">
+                <i class="bi bi-plus-lg"></i>
+              </button>
+          </div>
+  
+        <!-- Table -->
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th (click)="sortTable('name')">
+                Name 
+                <i class="bi" [ngClass]="{'bi-arrow-up-short': sortColumn === 'name' && sortDirection === 'asc', 
+                                          'bi-arrow-down-short': sortColumn === 'name' && sortDirection === 'desc'}"></i>
+              </th>
+              <th (click)="sortTable('description')">
+                Description 
+                <i class="bi" [ngClass]="{'bi-arrow-up-short': sortColumn === 'description' && sortDirection === 'asc', 
+                                          'bi-arrow-down-short': sortColumn === 'description' && sortDirection === 'desc'}"></i>
+              </th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let contract of paginatedServiceContracts">
+              <td>{{ contract.name }}</td>
+              <td>{{ contract.description }}</td>
+              <td>
+                <button class="btn btn-outline-secondary btn-sm me-2" (click)="editServiceContract(contract)">
+                  <i class="bi bi-pencil"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+  
+        <!-- Pagination Controls -->
+        <div class="d-flex justify-content-between align-items-center">
+          <button class="btn btn-outline-primary" [disabled]="currentPage === 1" (click)="previousPage()">← Previous</button>
+          <span>Page {{ currentPage }} of {{ totalPages }}</span>
+          <button class="btn btn-outline-primary" [disabled]="currentPage === totalPages" (click)="nextPage()">Next →</button>
+        </div>
+  
+      </app-card>
+    </div>
+  </div>
+  
+  <!-- Add Service Contract Modal -->
+<div class="modal fade" id="addServiceContractModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Add Service Contract</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label class="form-label">Name</label>
+              <input type="text" class="form-control" [(ngModel)]="newServiceContract.name" name="name">
+            </div>
+  
+            <div class="mb-3">
+              <label class="form-label">Description</label>
+              <input type="text" class="form-control" [(ngModel)]="newServiceContract.description" name="description">
+            </div>
+  
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" (click)="addServiceContract()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  

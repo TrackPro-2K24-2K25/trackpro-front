@@ -1,0 +1,130 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+
+<div class="row">
+    <div class="col-sm-12">
+      <app-card cardTitle="Bank Accounts Management">
+        <!-- Search Input and Add Button -->
+        <div class="d-flex justify-content-between mb-2">
+            <input type="text" class="form-control me-2" placeholder="Search..." [(ngModel)]="searchTerm" (input)="filterAccounts()">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBankAccountModal">
+                <i class="bi bi-plus-lg"></i> <!-- ✅ Opens Modal -->
+              </button>
+          </div>
+  
+        <!-- Table -->
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th (click)="sortTable('accountNumber')">
+                Account Number 
+                <i class="bi" [ngClass]="{'bi-arrow-up-short': sortColumn === 'accountNumber' && sortDirection === 'asc', 
+                                          'bi-arrow-down-short': sortColumn === 'accountNumber' && sortDirection === 'desc'}"></i>
+              </th>
+              <th (click)="sortTable('bankName')">
+                Bank Name 
+                <i class="bi" [ngClass]="{'bi-arrow-up-short': sortColumn === 'bankName' && sortDirection === 'asc', 
+                                          'bi-arrow-down-short': sortColumn === 'bankName' && sortDirection === 'desc'}"></i>
+              </th>
+              <th (click)="sortTable('iban')">
+                IBAN 
+                <i class="bi" [ngClass]="{'bi-arrow-up-short': sortColumn === 'iban' && sortDirection === 'asc', 
+                                          'bi-arrow-down-short': sortColumn === 'iban' && sortDirection === 'desc'}"></i>
+              </th>
+              <th (click)="sortTable('bic')">
+                BIC 
+                <i class="bi" [ngClass]="{'bi-arrow-up-short': sortColumn === 'bic' && sortDirection === 'asc', 
+                                          'bi-arrow-down-short': sortColumn === 'bic' && sortDirection === 'desc'}"></i>
+              </th>
+              <th (click)="sortTable('company')">
+                Company 
+                <i class="bi" [ngClass]="{'bi-arrow-up-short': sortColumn === 'company' && sortDirection === 'asc', 
+                                          'bi-arrow-down-short': sortColumn === 'company' && sortDirection === 'desc'}"></i>
+              </th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let account of paginatedAccounts">
+              <td>{{ account.accountNumber }}</td>
+              <td>{{ account.bankName }}</td>
+              <td>{{ account.iban }}</td>
+              <td>{{ account.bic }}</td>
+              <td>{{ account.company }}</td>
+              <td>
+                <!-- Edit Icon -->
+                <button class="btn btn-outline-secondary btn-sm me-2">
+                  <i class="bi bi-pencil"></i>
+                </button>
+      
+        
+              </td>
+            </tr>
+          </tbody>
+        </table>
+  
+        <!-- Pagination Controls -->
+        <div class="d-flex justify-content-between align-items-center">
+          <button class="btn btn-outline-primary" [disabled]="currentPage === 1" (click)="previousPage()">← Previous</button>
+          <span>Page {{ currentPage }} of {{ totalPages }}</span>
+          <button class="btn btn-outline-primary" [disabled]="currentPage === totalPages" (click)="nextPage()">Next →</button>
+        </div>
+  
+      </app-card>
+    </div>
+  </div>
+  
+
+  <!-- Bank Account Creation Modal -->
+<div class="modal fade" id="addBankAccountModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Create Bank Account</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <!-- Account Number -->
+            <div class="mb-3">
+              <label for="accountNumber" class="form-label">Account Number</label>
+              <input type="text" class="form-control" id="accountNumber" [(ngModel)]="newAccount.accountNumber" name="accountNumber">
+            </div>
+  
+            <!-- Bank Name -->
+            <div class="mb-3">
+              <label for="bankName" class="form-label">Bank Name</label>
+              <input type="text" class="form-control" id="bankName" [(ngModel)]="newAccount.bankName" name="bankName">
+            </div>
+  
+            <!-- IBAN -->
+            <div class="mb-3">
+              <label for="iban" class="form-label">IBAN</label>
+              <input type="text" class="form-control" id="iban" [(ngModel)]="newAccount.iban" name="iban">
+            </div>
+  
+            <!-- BIC -->
+            <div class="mb-3">
+              <label for="bic" class="form-label">BIC</label>
+              <input type="text" class="form-control" id="bic" [(ngModel)]="newAccount.bic" name="bic">
+            </div>
+  
+            <!-- Company (Dropdown) -->
+            <div class="mb-3">
+              <label for="company" class="form-label">Company</label>
+              <select class="form-select" id="company" [(ngModel)]="newAccount.company" name="company">
+                <option *ngFor="let company of companies" [value]="company">{{ company }}</option>
+              </select>
+            </div>
+  
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" (click)="addBankAccount()">Save</button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  
