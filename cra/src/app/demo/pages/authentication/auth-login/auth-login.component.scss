@@ -42,11 +42,11 @@
 
       .auth-form {
         flex-direction: column;
-        background: url('../../../../../assets/images/authentication/img-auth-bg.svg');
+        background: url('../../../../../assets/images/authentication/biometria.jpg');
         min-height: 100vh;
         padding: 24px;
         background-repeat: no-repeat;
-        background-size: auto 82%;
+        background-size: auto 100%;
         background-position: left bottom;
         position: relative;
         justify-content: space-between;
@@ -76,7 +76,33 @@
         width: 100%;
         max-width: 495px;
         box-shadow: none;
+        border-radius: 7%;
       }
+      .card-body h3 {
+        text-align: center;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+      }
+      .card-body h5 {
+        text-align: center;
+        font-weight: 400;
+        margin-bottom: 1.5rem;
+      }
+      .recaptcha-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 1rem;
+        margin-bottom: 1.5rem;
+      
+        re-captcha {
+          max-width: 100%;
+          display: block;
+          transform: scale(0.88);
+          transform-origin: center center;
+        }
+      }
+      
+      
 
       img + span {
         padding-left: 15px;
