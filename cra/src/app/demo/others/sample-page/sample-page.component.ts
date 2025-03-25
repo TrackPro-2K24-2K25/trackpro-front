@@ -1,14 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; 
-
-// Import CardComponent (if required)
+import { FormsModule } from '@angular/forms';
 import { CardComponent } from 'src/app/theme/shared/components/card/card.component';
-
-// Import Ant Design Icon Module
 import { IconDirective } from '@ant-design/icons-angular';
 import { IconService } from '@ant-design/icons-angular';
 import { PlusOutline } from '@ant-design/icons-angular/icons';
+import { AppUser } from 'src/app/models/interfaces/user.interface';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-sample-page',
@@ -17,54 +15,63 @@ import { PlusOutline } from '@ant-design/icons-angular/icons';
   templateUrl: './sample-page.component.html',
   styleUrls: ['./sample-page.component.scss']
 })
+export class SamplePageComponent implements OnInit {
+  users: AppUser[] = [];
+  paginatedUsers: AppUser[] = [];
 
-export class SamplePageComponent {
-  users = [
-    { firstName: 'Alice', lastName: 'Smith', email: 'alice@example.com', username: 'alice01', role: 'Admin' },
-    { firstName: 'Bob', lastName: 'Brown', email: 'bob@example.com', username: 'bob02', role: 'User' },
-    { firstName: 'Charlie', lastName: 'Davis', email: 'charlie@example.com', username: 'charlie03', role: 'Editor' },
-    { firstName: 'David', lastName: 'Evans', email: 'david@example.com', username: 'david04', role: 'User' },
-    { firstName: 'Emma', lastName: 'Fisher', email: 'emma@example.com', username: 'emma05', role: 'Admin' },
-    { firstName: 'Frank', lastName: 'Garcia', email: 'frank@example.com', username: 'frank06', role: 'User' },
-    { firstName: 'Grace', lastName: 'Harris', email: 'grace@example.com', username: 'grace07', role: 'Editor' },
-    { firstName: 'Henry', lastName: 'Irwin', email: 'henry@example.com', username: 'henry08', role: 'User' },
-    { firstName: 'Isabella', lastName: 'Jones', email: 'isabella@example.com', username: 'isabella09', role: 'Admin' },
-    { firstName: 'Jack', lastName: 'Kelly', email: 'jack@example.com', username: 'jack10', role: 'User' }
-  ];
-
-  paginatedUsers = [];
   searchTerm = '';
   currentPage = 1;
   pageSize = 5;
   totalPages = 1;
+
   sortColumn = '';
   sortDirection: 'asc' | 'desc' = 'asc';
 
-  constructor(private iconService: IconService) {
-    this.iconService.addIcon(PlusOutline); // ✅ Register Plus Icon
-    this.updatePagination();
+  constructor(private iconService: IconService, private userService: UserService) {
+    this.iconService.addIcon(PlusOutline);
   }
 
-  updatePagination() {
+  ngOnInit(): void {
+    this.loadUsers();
+  }
+
+  loadUsers(): void {
+    this.userService.getAllUsers().subscribe({
+      next: (response) => {
+        console.log('✅ Loaded users:', response.content);
+        this.users = response.content;
+        this.updatePagination();
+      },
+      error: (err) => {
+        console.error('❌ Error loading users:', err);
+      }
+    });
+  }
+  
+  
+
+  updatePagination(): void {
     this.totalPages = Math.ceil(this.users.length / this.pageSize);
-    this.paginatedUsers = this.users.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.paginatedUsers = this.users.slice(start, end);
   }
 
-  nextPage() {
+  nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
       this.updatePagination();
     }
   }
 
-  previousPage() {
+  previousPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
       this.updatePagination();
     }
   }
 
-  sortTable(column: string) {
+  sortTable(column: string): void {
     if (this.sortColumn === column) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
@@ -73,41 +80,28 @@ export class SamplePageComponent {
     }
 
     this.users.sort((a, b) => {
-      let valueA = a[column].toString().toLowerCase();
-      let valueB = b[column].toString().toLowerCase();
-
-      if (valueA < valueB) return this.sortDirection === 'asc' ? -1 : 1;
-      if (valueA > valueB) return this.sortDirection === 'asc' ? 1 : -1;
-      return 0;
+      const valueA = a[column]?.toString().toLowerCase() ?? '';
+      const valueB = b[column]?.toString().toLowerCase() ?? '';
+      return this.sortDirection === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
     });
 
     this.updatePagination();
   }
 
-  getSortArrow(column: string) {
-    if (this.sortColumn === column) {
-      return this.sortDirection === 'asc' ? '⬆️' : '⬇️';
-    }
-    return '↕️';
+  editUser(user: AppUser): void {
+    console.log('Edit user:', user);
+    // Navigate to edit form or open modal
   }
 
-  filterUsers() {
-    let filtered = this.users.filter(user =>
-      Object.values(user).some(value =>
-        value.toString().toLowerCase().includes(this.searchTerm.toLowerCase())
-      )
-    );
-    this.users = filtered;
-    this.updatePagination();
+  deleteUser(id: string): void {
+    this.userService.deleteUser(id).subscribe({
+      next: () => {
+        this.users = this.users.filter(user => user.id !== id);
+        this.updatePagination();
+      },
+      error: (err) => {
+        console.error('Failed to delete user:', err);
+      }
+    });
   }
-
-  editUser(user) {
-    console.log('Editing user:', user);
-  }
-
-  deleteUser(userId) {
-    console.log('Deleting user with ID:', userId);
-  }
-
-  
 }
