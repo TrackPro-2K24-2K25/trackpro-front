@@ -1,29 +1,36 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import { CardComponent } from 'src/app/theme/shared/components/card/card.component';
+import { PaymentTerm } from 'src/app/models/interfaces/payment-term.interface';
+import { PaymentTermService } from 'src/app/services/payment-term.service';
 import Swal from 'sweetalert2';
 import * as bootstrap from 'bootstrap';
 
 @Component({
   selector: 'app-payment-terms',
   standalone: true,
-  imports: [CommonModule, FormsModule ,CardComponent],
+  imports: [CommonModule, FormsModule, CardComponent],
   templateUrl: './payment-terms.component.html',
   styleUrls: ['./payment-terms.component.scss']
 })
-export class PaymentTermsComponent {
-  paymentTerms = [
-    { value: 'Net 30', description: 'Payment due in 30 days', days: 30, isDefault: false, isActive: true },
-    { value: 'Net 60', description: 'Payment due in 60 days', days: 60, isDefault: false, isActive: true },
-    { value: 'Net 90', description: 'Payment due in 90 days', days: 90, isDefault: false, isActive: false }
-  ];
+export class PaymentTermsComponent implements OnInit {
+  paymentTerms: PaymentTerm[] = [];
+  paginatedPaymentTerms: PaymentTerm[] = [];
+  selectedPaymentTerm: PaymentTerm | null = null;
+  editModalInstance: any;
 
-  newPaymentTerm = { value: '', description: '', days: 0, isDefault: false, isActive: true };
-  selectedPaymentTerm: any = null;
+
+  newPaymentTerm: PaymentTerm = {
+    id: '',
+    value: '',
+    description: '',
+    days: 0,
+    default: false,
+    active: true
+  };
+
   searchTerm = '';
-  paginatedPaymentTerms = [...this.paymentTerms];
   currentPage = 1;
   pageSize = 5;
   totalPages = 1;
@@ -31,67 +38,25 @@ export class PaymentTermsComponent {
   sortDirection: 'asc' | 'desc' = 'asc';
   modalInstance: any;
 
-  constructor() {
-    this.updatePagination();
+  constructor(private paymentTermService: PaymentTermService) {}
+
+  ngOnInit(): void {
+    this.loadPaymentTerms();
   }
 
-  updatePagination() {
-    this.totalPages = Math.ceil(this.paginatedPaymentTerms.length / this.pageSize);
-    this.paginatedPaymentTerms = this.paginatedPaymentTerms.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
-  }
-
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updatePagination();
-    }
-  }
-
-  previousPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updatePagination();
-    }
-  }
-
-  sortTable(column: string) {
-    if (this.sortColumn === column) {
-      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
-    } else {
-      this.sortColumn = column;
-      this.sortDirection = 'asc';
-    }
-
-    this.paginatedPaymentTerms.sort((a, b) => {
-      let valueA = a[column].toString().toLowerCase();
-      let valueB = b[column].toString().toLowerCase();
-
-      if (valueA < valueB) return this.sortDirection === 'asc' ? -1 : 1;
-      if (valueA > valueB) return this.sortDirection === 'asc' ? 1 : -1;
-      return 0;
+  loadPaymentTerms(): void {
+    this.paymentTermService.getAll().subscribe({
+      next: (data: any) => {
+        this.paymentTerms = data.content || data;
+        this.applyFilters();
+      },
+      error: err => {
+        console.error('❌ Error loading payment terms:', err);
+      }
     });
-
-    this.updatePagination();
   }
 
-  filterPaymentTerms() {
-    const lowerCaseSearch = this.searchTerm.toLowerCase().trim();
-    this.paginatedPaymentTerms = this.paymentTerms.filter(term =>
-      Object.values(term).some(value =>
-        value.toString().toLowerCase().includes(lowerCaseSearch)
-      )
-    );
-    this.updatePagination();
-  }
-
-  ngAfterViewInit() {
-    const modalElement = document.getElementById('addPaymentTermModal');
-    if (modalElement) {
-      this.modalInstance = new bootstrap.Modal(modalElement);
-    }
-  }
-
-  addPaymentTerm() {
+  addPaymentTerm(): void {
     if (!this.newPaymentTerm.value || !this.newPaymentTerm.description || this.newPaymentTerm.days <= 0) {
       Swal.fire({
         icon: 'error',
@@ -101,39 +66,162 @@ export class PaymentTermsComponent {
       });
       return;
     }
-    this.paymentTerms.push({ ...this.newPaymentTerm });
-    this.newPaymentTerm = { value: '', description: '', days: 0, isDefault: false, isActive: true };
-    this.updatePagination();
-    Swal.fire({
-      icon: 'success',
-      title: 'Payment Term Added',
-      text: 'The payment term has been successfully added!',
-      confirmButtonColor: '#3085d6'
+
+    this.paymentTermService.create(this.newPaymentTerm).subscribe({
+      next: created => {
+        this.paymentTerms.push(created);
+        this.applyFilters();
+        this.resetForm();
+        Swal.fire({
+          icon: 'success',
+          title: 'Payment Term Added',
+          confirmButtonColor: '#3085d6'
+        });
+        this.modalInstance?.hide();
+      },
+      error: err => {
+        console.error('❌ Failed to save:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Save Failed',
+          text: 'Something went wrong while saving the payment term.'
+        });
+      }
     });
-    this.modalInstance.hide();
   }
 
-  editPaymentTerm(term: any) {
+  deletePaymentTerm(id: string): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This will delete the payment term permanently.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then(result => {
+      if (result.isConfirmed) {
+        this.paymentTermService.delete(id).subscribe({
+          next: () => {
+            this.paymentTerms = this.paymentTerms.filter(term => term.id !== id);
+            this.applyFilters();
+            Swal.fire('Deleted!', 'The payment term has been deleted.', 'success');
+          },
+          error: err => {
+            console.error('❌ Failed to delete:', err);
+            Swal.fire('Error', 'Failed to delete the payment term.', 'error');
+          }
+        });
+      }
+    });
+  }
+
+  editPaymentTerm(term: PaymentTerm): void {
     this.selectedPaymentTerm = { ...term };
-    const modalElement = document.getElementById('editPaymentTermModal');
-    if (modalElement) {
-      this.modalInstance = new bootstrap.Modal(modalElement);
-      this.modalInstance.show();
+    const modalEl = document.getElementById('editPaymentTermModal');
+    if (modalEl) {
+      this.editModalInstance = new bootstrap.Modal(modalEl);
+      this.editModalInstance.show();
     }
   }
 
   updatePaymentTerm() {
-    const index = this.paymentTerms.findIndex(term => term.value === this.selectedPaymentTerm.value);
-    if (index !== -1) {
-      this.paymentTerms[index] = { ...this.selectedPaymentTerm };
-    }
-    this.updatePagination();
-    Swal.fire({
-      icon: 'success',
-      title: 'Payment Term Updated',
-      text: 'The payment term has been successfully updated!',
-      confirmButtonColor: '#3085d6'
+    if (!this.selectedPaymentTerm) return;
+  
+    const updatedTerm: PaymentTerm = {
+      id: this.selectedPaymentTerm.id,
+      value: this.selectedPaymentTerm.value,
+      description: this.selectedPaymentTerm.description,
+      days: this.selectedPaymentTerm.days,
+      default: this.selectedPaymentTerm.default,
+      active: this.selectedPaymentTerm.active,
+      invoicingConditions: [] // ✅ Required by backend
+    };
+  
+    this.paymentTermService.update(this.selectedPaymentTerm.id, updatedTerm).subscribe({
+      next: () => {
+        Swal.fire('Updated!', 'Payment term updated successfully.', 'success');
+        this.loadPaymentTerms();
+        this.modalInstance.hide();
+      },
+      error: (err) => {
+        console.error('❌ Error updating term:', err);
+        Swal.fire('Error', 'Failed to update payment term.', 'error');
+      }
     });
-    this.modalInstance.hide();
+  }
+  
+  
+  
+  
+
+  sortTable(column: string): void {
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+
+    this.paymentTerms.sort((a, b) => {
+      const valA = (a as any)[column]?.toString().toLowerCase() || '';
+      const valB = (b as any)[column]?.toString().toLowerCase() || '';
+
+      if (valA < valB) return this.sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return this.sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    this.applyFilters();
+  }
+
+  filterPaymentTerms(): void {
+    this.applyFilters();
+  }
+
+  applyFilters(): void {
+    const term = this.searchTerm.toLowerCase().trim();
+    const filtered = this.paymentTerms.filter(item =>
+      Object.values(item).some(value =>
+        value?.toString().toLowerCase().includes(term)
+      )
+    );
+    this.totalPages = Math.ceil(filtered.length / this.pageSize);
+    this.currentPage = Math.min(this.currentPage, this.totalPages || 1);
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.paginatedPaymentTerms = filtered.slice(start, end);
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.applyFilters();
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.applyFilters();
+    }
+  }
+
+  resetForm(): void {
+    this.newPaymentTerm = {
+      id: '',
+      value: '',
+      description: '',
+      days: 0,
+      default: false,
+      active: true
+    };
+  }
+
+  ngAfterViewInit(): void {
+    const modalEl = document.getElementById('addPaymentTermModal');
+    if (modalEl) {
+      this.modalInstance = new bootstrap.Modal(modalEl);
+    }
   }
 }

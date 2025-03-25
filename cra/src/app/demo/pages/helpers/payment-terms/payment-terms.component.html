@@ -1,123 +1,163 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
 <div class="row">
-    <div class="col-sm-12">
-        <app-card cardTitle="Payment Terms Management">
-            <!-- Search Input and Add Button -->
-            <div class="d-flex justify-content-between mb-2">
-                <input type="text" class="form-control me-2" placeholder="Search..." [(ngModel)]="searchTerm"
-                    (input)="filterPaymentTerms()">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                    data-bs-target="#addPaymentTermModal">
-                    <i class="bi bi-plus-lg"></i> <!-- Opens Modal -->
-                </button>
-            </div>
+  <div class="col-sm-12">
+    <app-card cardTitle="Payment Terms Management">
+      <!-- Search and Add -->
+      <div class="d-flex justify-content-between mb-2">
+        <input type="text" class="form-control me-2" placeholder="Search..." [(ngModel)]="searchTerm" (input)="filterPaymentTerms()">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPaymentTermModal">
+          <i class="bi bi-plus-lg"></i>
+        </button>
+      </div>
 
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th (click)="sortTable('value')">
-                            Value
-                            <i class="bi"
-                                [ngClass]="{'bi-arrow-up-short': sortColumn === 'value' && sortDirection === 'asc', 
-                                            'bi-arrow-down-short': sortColumn === 'value' && sortDirection === 'desc'}"></i>
-                        </th>
-                        <th (click)="sortTable('description')">
-                            Description
-                            <i class="bi"
-                                [ngClass]="{'bi-arrow-up-short': sortColumn === 'description' && sortDirection === 'asc', 
-                                            'bi-arrow-down-short': sortColumn === 'description' && sortDirection === 'desc'}"></i>
-                        </th>
-                        <th (click)="sortTable('days')">
-                            Days
-                            <i class="bi"
-                                [ngClass]="{'bi-arrow-up-short': sortColumn === 'days' && sortDirection === 'asc', 
-                                            'bi-arrow-down-short': sortColumn === 'days' && sortDirection === 'desc'}"></i>
-                        </th>
-                        <th>Default</th>
-                        <th>Active</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let term of paginatedPaymentTerms">
-                        <td>{{ term.value }}</td>
-                        <td>{{ term.description }}</td>
-                        <td>{{ term.days }}</td>
-                        <td>{{ term.isDefault ? 'Yes' : 'No' }}</td>
-                        <td>{{ term.isActive ? 'Yes' : 'No' }}</td>
-                        <td>
-                            <!-- Edit Icon -->
-                            <button class="btn btn-outline-secondary btn-sm me-2" (click)="editPaymentTerm(term)">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+      <!-- Table -->
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th (click)="sortTable('value')">
+              Value
+              <i class="bi" [ngClass]="{
+                'bi-arrow-up-short': sortColumn === 'value' && sortDirection === 'asc',
+                'bi-arrow-down-short': sortColumn === 'value' && sortDirection === 'desc'
+              }"></i>
+            </th>
+            <th (click)="sortTable('description')">
+              Description
+              <i class="bi" [ngClass]="{
+                'bi-arrow-up-short': sortColumn === 'description' && sortDirection === 'asc',
+                'bi-arrow-down-short': sortColumn === 'description' && sortDirection === 'desc'
+              }"></i>
+            </th>
+            <th (click)="sortTable('days')">
+              Days
+              <i class="bi" [ngClass]="{
+                'bi-arrow-up-short': sortColumn === 'days' && sortDirection === 'asc',
+                'bi-arrow-down-short': sortColumn === 'days' && sortDirection === 'desc'
+              }"></i>
+            </th>
+            <th>Default</th>
+            <th>Active</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="paginatedPaymentTerms.length === 0">
+            <td colspan="6" class="text-center text-muted">No payment terms found.</td>
+          </tr>
+          <tr *ngFor="let term of paginatedPaymentTerms">
+            <td>{{ term.value }}</td>
+            <td>{{ term.description }}</td>
+            <td>{{ term.days }}</td>
+            <td>{{ term.default ? 'Yes' : 'No' }}</td>
+            <td>{{ term.active ? 'Yes' : 'No' }}</td>
+            <td>
+              <!-- Edit -->
+              <button class="btn btn-outline-secondary btn-sm me-2" (click)="editPaymentTerm(term)">
+                <i class="bi bi-pencil"></i>
+              </button>
 
-            <!-- Pagination Controls -->
-            <div class="d-flex justify-content-between align-items-center">
-                <button class="btn btn-outline-primary" [disabled]="currentPage === 1" (click)="previousPage()">←
-                    Previous</button>
-                <span>Page {{ currentPage }} of {{ totalPages }}</span>
-                <button class="btn btn-outline-primary" [disabled]="currentPage === totalPages"
-                    (click)="nextPage()">Next →</button>
-            </div>
+              <!-- Delete -->
+              <button class="btn btn-outline-danger btn-sm" (click)="deletePaymentTerm(term.id)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-
-        </app-card>
-    </div>
+      <!-- Pagination -->
+      <div class="d-flex justify-content-between align-items-center">
+        <button class="btn btn-outline-primary" [disabled]="currentPage === 1" (click)="previousPage()">← Previous</button>
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <button class="btn btn-outline-primary" [disabled]="currentPage === totalPages" (click)="nextPage()">Next →</button>
+      </div>
+    </app-card>
+  </div>
 </div>
 
-
-<!-- Add Payment Term Modal -->
+<!-- Add Modal -->
 <div class="modal fade" id="addPaymentTermModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalTitle">Add Payment Term</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <!-- Value -->
-                    <div class="mb-3">
-                        <label class="form-label">Value</label>
-                        <input type="text" class="form-control" [(ngModel)]="newPaymentTerm.value" name="value">
-                    </div>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle">Add Payment Term</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
 
-                    <!-- Description -->
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <input type="text" class="form-control" [(ngModel)]="newPaymentTerm.description"
-                            name="description">
-                    </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label class="form-label">Value</label>
+            <input type="text" class="form-control" [(ngModel)]="newPaymentTerm.value" name="value">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-control" [(ngModel)]="newPaymentTerm.description" name="description">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Days</label>
+            <input type="number" class="form-control" [(ngModel)]="newPaymentTerm.days" name="days">
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" [(ngModel)]="newPaymentTerm.default" name="isDefault">
+            <label class="form-check-label">Default</label>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" [(ngModel)]="newPaymentTerm.active" name="isActive">
+            <label class="form-check-label">Active</label>
+          </div>
+        </form>
+      </div>
 
-                    <!-- Days -->
-                    <div class="mb-3">
-                        <label class="form-label">Days</label>
-                        <input type="number" class="form-control" [(ngModel)]="newPaymentTerm.days" name="days">
-                    </div>
-
-                    <!-- Default Checkbox -->
-                    <div class="mb-3">
-                        <input type="checkbox" [(ngModel)]="newPaymentTerm.isDefault" name="isDefault"> Default
-                    </div>
-
-                    <!-- Active Checkbox -->
-                    <div class="mb-3">
-                        <input type="checkbox" [(ngModel)]="newPaymentTerm.isActive" name="isActive"> Active
-                    </div>
-
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" (click)="addPaymentTerm()">Save</button>
-            </div>
-        </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" (click)="addPaymentTerm()">Save</button>
+      </div>
     </div>
+  </div>
 </div>
 
 
+<!-- Edit Modal -->
+<div class="modal fade" id="editPaymentTermModal" tabindex="-1" aria-labelledby="editModalTitle" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalTitle">Edit Payment Term</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+  
+        <div class="modal-body" *ngIf="selectedPaymentTerm">
+          <form>
+            <div class="mb-3">
+              <label class="form-label">Value</label>
+              <input type="text" class="form-control" [(ngModel)]="selectedPaymentTerm.value" name="editValue">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Description</label>
+              <input type="text" class="form-control" [(ngModel)]="selectedPaymentTerm.description" name="editDescription">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Days</label>
+              <input type="number" class="form-control" [(ngModel)]="selectedPaymentTerm.days" name="editDays">
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" [(ngModel)]="selectedPaymentTerm.default" name="editDefault">
+              <label class="form-check-label">Default</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" [(ngModel)]="selectedPaymentTerm.active" name="editActive">
+              <label class="form-check-label">Active</label>
+            </div>
+          </form>
+        </div>
+  
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-success" (click)="updatePaymentTerm()">Update</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
