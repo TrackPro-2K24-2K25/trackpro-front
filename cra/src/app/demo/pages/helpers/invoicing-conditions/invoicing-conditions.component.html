@@ -1,100 +1,152 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
 <div class="row">
-    <div class="col-sm-12">
-        <app-card cardTitle="Invoicing Conditions Management">
-            <!-- Search Input and Add Button -->
-            <div class="d-flex justify-content-between mb-2">
-                <input type="text" class="form-control me-2" placeholder="Search..." [(ngModel)]="searchTerm"
-                    (input)="filterInvoicingConditions()">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                    data-bs-target="#addInvoicingConditionModal">
-                    <i class="bi bi-plus-lg"></i>
-                </button>
-            </div>
+  <div class="col-sm-12">
+    <app-card cardTitle="Invoicing Conditions Management">
+      <!-- Search Input and Add Button -->
+      <div class="d-flex justify-content-between mb-2">
+        <input
+          type="text"
+          class="form-control me-2"
+          placeholder="Search..."
+          [(ngModel)]="searchTerm"
+          (input)="filterInvoicingConditions()"
+        />
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#addInvoicingConditionModal"
+        >
+          <i class="bi bi-plus-lg"></i>
+        </button>
+      </div>
 
-            <!-- Table -->
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Payment Term</th>
-                        <th>Discount (%)</th>
-                        <th>Days for Discount</th>
-                        <th>Late Fee Rate (%)</th>
-                        <th>Active</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let condition of paginatedInvoicingConditions">
-                        <td>{{ condition.paymentTerm }}</td>
-                        <td>{{ condition.discount }}</td>
-                        <td>{{ condition.daysForDiscount }}</td>
-                        <td>{{ condition.lateFeeRate }}</td>
-                        <td>{{ condition.isActive ? 'Yes' : 'No' }}</td>
-                    </tr>
-                </tbody>
-            </table>
+      <!-- Table -->
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Payment Term</th>
+            <th>Discount (%)</th>
+            <th>Days for Discount</th>
+            <th>Late Fee Rate (%)</th>
+            <th>Active</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let condition of paginatedInvoicingConditions">
+            <td>{{ condition.paymentTerm.value }}</td>
+            <td>{{ condition.discount }}</td>
+            <td>{{ condition.daysForDiscount }}</td>
+            <td>{{ condition.lateFeeRate }}</td>
+            <td>{{ condition.isActive ? 'Yes' : 'No' }}</td>
+          </tr>
+        </tbody>
+      </table>
 
-            <!-- Pagination Controls -->
-            <div class="d-flex justify-content-between align-items-center">
-                <button class="btn btn-outline-primary" [disabled]="currentPage === 1" (click)="previousPage()">←
-                    Previous</button>
-                <span>Page {{ currentPage }} of {{ totalPages }}</span>
-                <button class="btn btn-outline-primary" [disabled]="currentPage === totalPages"
-                    (click)="nextPage()">Next →</button>
-            </div>
-
-        </app-card>
-    </div>
+      <!-- Pagination Controls -->
+      <div class="d-flex justify-content-between align-items-center">
+        <button class="btn btn-outline-primary" [disabled]="currentPage === 1" (click)="previousPage()">
+          ← Previous
+        </button>
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <button class="btn btn-outline-primary" [disabled]="currentPage === totalPages" (click)="nextPage()">
+          Next →
+        </button>
+      </div>
+    </app-card>
+  </div>
 </div>
 
-  <!-- Add Invoicing Condition Modal -->
-  <div class="modal fade" id="addInvoicingConditionModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalTitle">Add Invoicing Condition</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form>
-            <!-- Payment Term -->
-            <div class="mb-3">
-              <label class="form-label">Payment Term</label>
-              <select class="form-select" [(ngModel)]="newInvoicingCondition.paymentTerm" name="paymentTerm">
-                <option *ngFor="let term of paymentTerms" [value]="term">{{ term }}</option>
-              </select>
-            </div>
-  
-            <!-- Discount Percentage -->
-            <div class="mb-3">
-              <label class="form-label">Discount (%)</label> <!-- Discount percentage for early payment -->
-              <input type="number" step="0.01" class="form-control" [(ngModel)]="newInvoicingCondition.discount" name="discount" placeholder="e.g., 2.00%">
-            </div>
-  
-            <!-- Days for Discount -->
-            <div class="mb-3">
-              <label class="form-label">Days for Discount</label> <!-- Number of days to receive the discount -->
-              <input type="number" class="form-control" [(ngModel)]="newInvoicingCondition.daysForDiscount" name="daysForDiscount" placeholder="e.g., 10 days">
-            </div>
-  
-            <!-- Late Fee Rate -->
-            <div class="mb-3">
-              <label class="form-label">Late Fee Rate (%)</label> <!-- Late fee rate per month -->
-              <input type="number" step="0.01" class="form-control" [(ngModel)]="newInvoicingCondition.lateFeeRate" name="lateFeeRate" placeholder="e.g., 1.50% per month">
-            </div>
-  
-            <!-- Active Checkbox -->
-            <div class="mb-3">
-              <input type="checkbox" [(ngModel)]="newInvoicingCondition.isActive" name="isActive"> Active <!-- Mark condition as active -->
-            </div>
-  
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" (click)="addInvoicingCondition()">Save</button>
-        </div>
+<!-- Add Invoicing Condition Modal -->
+<div
+  class="modal fade"
+  id="addInvoicingConditionModal"
+  tabindex="-1"
+  aria-labelledby="modalTitle"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle">Add Invoicing Condition</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <!-- Payment Term -->
+          <div class="mb-3">
+            <label class="form-label">Payment Term</label>
+            <select
+              class="form-select"
+              [(ngModel)]="newInvoicingCondition.paymentTerm"
+              name="paymentTerm"
+            >
+              <option *ngFor="let term of paymentTerms" [ngValue]="term">
+                {{ term.value }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Discount Percentage -->
+          <div class="mb-3">
+            <label class="form-label">Discount (%)</label>
+            <input
+              type="number"
+              step="0.01"
+              class="form-control"
+              [(ngModel)]="newInvoicingCondition.discount"
+              name="discount"
+              placeholder="e.g., 2.00%"
+            />
+          </div>
+
+          <!-- Days for Discount -->
+          <div class="mb-3">
+            <label class="form-label">Days for Discount</label>
+            <input
+              type="number"
+              class="form-control"
+              [(ngModel)]="newInvoicingCondition.daysForDiscount"
+              name="daysForDiscount"
+              placeholder="e.g., 10 days"
+            />
+          </div>
+
+          <!-- Late Fee Rate -->
+          <div class="mb-3">
+            <label class="form-label">Late Fee Rate (%)</label>
+            <input
+              type="number"
+              step="0.01"
+              class="form-control"
+              [(ngModel)]="newInvoicingCondition.lateFeeRate"
+              name="lateFeeRate"
+              placeholder="e.g., 1.50% per month"
+            />
+          </div>
+
+          <!-- Active Checkbox -->
+          <div class="mb-3 form-check">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              [(ngModel)]="newInvoicingCondition.isActive"
+              name="isActive"
+              id="isActiveCheck"
+            />
+            <label class="form-check-label" for="isActiveCheck">Active</label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+        <button type="button" class="btn btn-primary" (click)="addInvoicingCondition()">
+          Save
+        </button>
       </div>
     </div>
   </div>
+</div>

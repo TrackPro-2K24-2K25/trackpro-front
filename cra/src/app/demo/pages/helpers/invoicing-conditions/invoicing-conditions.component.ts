@@ -1,9 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CardComponent } from 'src/app/theme/shared/components/card/card.component';
 import Swal from 'sweetalert2';
 import * as bootstrap from 'bootstrap';
+import { InvoicingConditions } from 'src/app/models/interfaces/invoicing-conditions.interface';
+import { PaymentTerm } from 'src/app/models/interfaces/payment-term.interface';
+import { PaymentTermService } from 'src/app/services/payment-term.service';
+import { InvoicingConditionService } from 'src/app/services/invoicing-condition.service';
 
 @Component({
   selector: 'app-invoicing-conditions',
@@ -12,61 +16,89 @@ import * as bootstrap from 'bootstrap';
   templateUrl: './invoicing-conditions.component.html',
   styleUrls: ['./invoicing-conditions.component.scss']
 })
-export class InvoicingConditionsComponent {
-  invoicingConditions = [
-    { paymentTerm: 'Net 30', discount: 2, daysForDiscount: 10, lateFeeRate: 1.5, isActive: true },
-    { paymentTerm: 'Net 60', discount: 3, daysForDiscount: 15, lateFeeRate: 2.0, isActive: false }
-  ];
+export class InvoicingConditionsComponent implements AfterViewInit {
+  invoicingConditions: InvoicingConditions[] = [];
+  paginatedInvoicingConditions: InvoicingConditions[] = [];
 
-  paymentTerms = ['Net 30', 'Net 60', 'Net 90']; // List of available payment terms
+  paymentTerms: PaymentTerm[] = [];
 
-  newInvoicingCondition = {
-    paymentTerm: '',
-    discount: null, // Discount percentage for early payment (e.g., 2%)
-    daysForDiscount: null, // Number of days to receive the discount (e.g., 10 days)
-    lateFeeRate: null, // Late fee rate (e.g., 1.5% per month)
+  newInvoicingCondition: InvoicingConditions = {
+    paymentTerm: {} as PaymentTerm,
+    discount: 0,
+    daysForDiscount: 0,
+    lateFeeRate: 0,
     isActive: true
   };
-  
-  
+
   searchTerm = '';
-  paginatedInvoicingConditions = [...this.invoicingConditions];
   currentPage = 1;
   pageSize = 5;
   totalPages = 1;
+
   modalInstance: any;
 
-  constructor() {
-    this.updatePagination();
+  constructor(
+    private paymentTermService: PaymentTermService,
+    private invoicingConditionService: InvoicingConditionService
+  ) {
+    this.loadPaymentTerms();
+    this.loadInvoicingConditions();
+  }
+
+  loadPaymentTerms() {
+    this.paymentTermService.getAll().subscribe({
+      next: (response) => {
+        this.paymentTerms = response.content;
+        console.log('✅ Payment terms loaded:', this.paymentTerms);
+      },
+      error: (err) => {
+        console.error('❌ Failed to load payment terms', err);
+        Swal.fire('Error', 'Failed to load payment terms.', 'error');
+      }
+    });
+  }
+
+  loadInvoicingConditions() {
+    this.invoicingConditionService.getAll(this.currentPage - 1, this.pageSize).subscribe({
+      next: (response) => {
+        this.invoicingConditions = response.content;
+        this.totalPages = response.totalPages;
+        this.updatePagination();
+      },
+      error: (err) => {
+        console.error('❌ Failed to load invoicing conditions', err);
+        Swal.fire('Error', 'Failed to load invoicing conditions.', 'error');
+      }
+    });
   }
 
   updatePagination() {
-    this.totalPages = Math.ceil(this.paginatedInvoicingConditions.length / this.pageSize);
-    this.paginatedInvoicingConditions = this.paginatedInvoicingConditions.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
+    this.paginatedInvoicingConditions = this.invoicingConditions;
   }
 
   nextPage() {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
-      this.updatePagination();
+      this.loadInvoicingConditions();
     }
   }
 
   previousPage() {
     if (this.currentPage > 1) {
       this.currentPage--;
-      this.updatePagination();
+      this.loadInvoicingConditions();
     }
   }
 
   filterInvoicingConditions() {
-    const lowerCaseSearch = this.searchTerm.toLowerCase().trim();
+    const lower = this.searchTerm.toLowerCase().trim();
     this.paginatedInvoicingConditions = this.invoicingConditions.filter(condition =>
-      Object.values(condition).some(value =>
-        value.toString().toLowerCase().includes(lowerCaseSearch)
-      )
+      condition.paymentTerm.value.toLowerCase().includes(lower) ||
+      condition.discount.toString().includes(lower) ||
+      condition.daysForDiscount.toString().includes(lower) ||
+      condition.lateFeeRate.toString().includes(lower) ||
+      (condition.isActive ? 'yes' : 'no').includes(lower)
     );
-    this.updatePagination();
   }
 
   ngAfterViewInit() {
@@ -77,7 +109,12 @@ export class InvoicingConditionsComponent {
   }
 
   addInvoicingCondition() {
-    if (!this.newInvoicingCondition.paymentTerm.trim() || this.newInvoicingCondition.discount < 0 || this.newInvoicingCondition.daysForDiscount < 0 || this.newInvoicingCondition.lateFeeRate < 0) {
+    if (
+      !this.newInvoicingCondition.paymentTerm?.id ||
+      this.newInvoicingCondition.discount < 0 ||
+      this.newInvoicingCondition.daysForDiscount < 0 ||
+      this.newInvoicingCondition.lateFeeRate < 0
+    ) {
       Swal.fire({
         icon: 'error',
         title: 'Invalid Input',
@@ -86,21 +123,22 @@ export class InvoicingConditionsComponent {
       });
       return;
     }
-    this.invoicingConditions.push({ ...this.newInvoicingCondition });
-    this.newInvoicingCondition = {
-      paymentTerm: '',
-      discount: 0, // Reset discount percentage
-      daysForDiscount: 0, // Reset days for discount
-      lateFeeRate: 0, // Reset late fee rate
-      isActive: true
-    };
-    this.updatePagination();
-    Swal.fire({
-      icon: 'success',
-      title: 'Invoicing Condition Added',
-      text: 'The invoicing condition has been successfully added!',
-      confirmButtonColor: '#3085d6'
+
+    this.invoicingConditionService.create(this.newInvoicingCondition).subscribe({
+      next: (saved) => {
+        this.loadInvoicingConditions(); // Refresh list
+        Swal.fire({
+          icon: 'success',
+          title: 'Added',
+          text: 'The invoicing condition was successfully added!',
+          confirmButtonColor: '#3085d6'
+        });
+        this.modalInstance.hide();
+      },
+      error: (err) => {
+        console.error('❌ Failed to save invoicing condition', err);
+        Swal.fire('Error', 'Failed to save invoicing condition.', 'error');
+      }
     });
-    this.modalInstance.hide();
   }
 }
