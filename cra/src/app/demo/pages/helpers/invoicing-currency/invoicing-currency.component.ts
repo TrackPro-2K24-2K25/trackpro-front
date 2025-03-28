@@ -33,6 +33,7 @@ export class InvoicingCurrencyComponent implements OnInit {
   ngOnInit(): void {
     this.loadCurrencies();
   }
+  
 
   ngAfterViewInit() {
     const modalElement = document.getElementById('addCurrencyModal');

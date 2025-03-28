@@ -12,7 +12,6 @@ export class InvoicingCurrencyService {
 
   constructor(private http: HttpClient) {}
 
-  
 
 getAll(): Observable<InvoicingCurrency[]> {
   return this.http
