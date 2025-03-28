@@ -1,8 +1,8 @@
-// src/app/services/payment-term.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { PaymentTerm } from '../models/interfaces/payment-term.interface';
+import { PaginatedResponse } from '../models/interfaces/paginated-response.interface';
 
 @Injectable({ providedIn: 'root' })
 export class PaymentTermService {
@@ -10,8 +10,10 @@ export class PaymentTermService {
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<PaymentTerm[]> {
-    return this.http.get<PaymentTerm[]>(this.baseUrl);
+  getAll(page = 0, size = 100): Observable<PaginatedResponse<PaymentTerm>> {
+    return this.http.get<PaginatedResponse<PaymentTerm>>(
+      `${this.baseUrl}?page=${page}&size=${size}`
+    );
   }
 
   getById(id: string): Observable<PaymentTerm> {
