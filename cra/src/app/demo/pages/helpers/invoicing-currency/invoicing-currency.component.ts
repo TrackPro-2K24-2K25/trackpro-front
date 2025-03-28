@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CardComponent } from 'src/app/theme/shared/components/card/card.component';
 import Swal from 'sweetalert2';
 import * as bootstrap from 'bootstrap';
+import { InvoicingCurrency } from './../../../../models/interfaces/invoicing-currency.interface';
+import { InvoicingCurrencyService } from './../../../../services/invoicing-currency.service';
 
 @Component({
   selector: 'app-invoicing-currency',
@@ -12,10 +14,13 @@ import * as bootstrap from 'bootstrap';
   templateUrl: './invoicing-currency.component.html',
   styleUrls: ['./invoicing-currency.component.scss']
 })
-export class InvoicingCurrencyComponent {
+export class InvoicingCurrencyComponent implements OnInit {
+  currencies: InvoicingCurrency[] = [];
+  paginatedCurrencies: InvoicingCurrency[] = [];
+  newCurrency: Partial<InvoicingCurrency> = { value: '' };
+  selectedCurrency: InvoicingCurrency | null = null;
+
   searchTerm = '';
-  newCurrency = { value: '' };
-  paginatedCurrencies = [];
   currentPage = 1;
   pageSize = 5;
   totalPages = 1;
@@ -23,52 +28,10 @@ export class InvoicingCurrencyComponent {
   sortDirection: 'asc' | 'desc' = 'asc';
   modalInstance: any;
 
-  constructor() {
-    this.updatePagination();
-  }
+  constructor(private currencyService: InvoicingCurrencyService) {}
 
-  updatePagination() {
-    this.totalPages = Math.ceil(this.paginatedCurrencies.length / this.pageSize);
-    this.paginatedCurrencies = this.paginatedCurrencies.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
-  }
-
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updatePagination();
-    }
-  }
-
-  previousPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updatePagination();
-    }
-  }
-
-  sortTable(column: string) {
-    if (this.sortColumn === column) {
-      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
-    } else {
-      this.sortColumn = column;
-      this.sortDirection = 'asc';
-    }
-
-    this.paginatedCurrencies.sort((a, b) => {
-      let valueA = a[column].toString().toLowerCase();
-      let valueB = b[column].toString().toLowerCase();
-      return this.sortDirection === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
-    });
-
-    this.updatePagination();
-  }
-
-  filterCurrencies() {
-    const lowerCaseSearch = this.searchTerm.toLowerCase().trim();
-    this.paginatedCurrencies = this.paginatedCurrencies.filter(currency =>
-      currency.value.toLowerCase().includes(lowerCaseSearch)
-    );
-    this.updatePagination();
+  ngOnInit(): void {
+    this.loadCurrencies();
   }
 
   ngAfterViewInit() {
@@ -78,25 +41,110 @@ export class InvoicingCurrencyComponent {
     }
   }
 
-  addCurrency() {
-    if (!this.newCurrency.value.trim()) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Missing Fields',
-        text: 'Currency value cannot be empty!',
-        confirmButtonColor: '#d33'
-      });
+  loadCurrencies(): void {
+    this.currencyService.getAll().subscribe({
+      next: (data) => {
+        this.currencies = data;
+        this.filterCurrencies();
+      },
+      error: () => {
+        Swal.fire('Error', 'Failed to load currencies', 'error');
+      }
+    });
+  }
+
+  addCurrency(): void {
+    if (!this.newCurrency.value?.trim()) {
+      Swal.fire('Missing Fields', 'Currency value cannot be empty!', 'error');
       return;
     }
-    this.paginatedCurrencies.push({ ...this.newCurrency });
-    this.newCurrency.value = '';
-    this.updatePagination();
-    Swal.fire({
-      icon: 'success',
-      title: 'Currency Added',
-      text: 'The invoicing currency has been successfully added!',
-      confirmButtonColor: '#3085d6'
+
+    this.currencyService.create(this.newCurrency).subscribe({
+      next: (created) => {
+        this.currencies.push(created);
+        this.filterCurrencies();
+        this.newCurrency = { value: '' };
+        this.modalInstance.hide();
+        Swal.fire('Success', 'Currency added!', 'success');
+      },
+      error: () => {
+        Swal.fire('Error', 'Failed to add currency', 'error');
+      }
     });
-    this.modalInstance.hide();
+  }
+
+  deleteCurrency(currency: InvoicingCurrency): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: `Delete "${currency.value}"?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#aaa',
+      confirmButtonText: 'Yes, delete it!'
+    }).then(result => {
+      if (result.isConfirmed) {
+        this.currencyService.delete(currency.id).subscribe({
+          next: () => {
+            this.currencies = this.currencies.filter(c => c.id !== currency.id);
+            this.filterCurrencies();
+            Swal.fire('Deleted!', 'Currency deleted.', 'success');
+          },
+          error: () => {
+            Swal.fire('Error', 'Failed to delete currency', 'error');
+          }
+        });
+      }
+    });
+  }
+
+  filterCurrencies(): void {
+    const term = this.searchTerm.toLowerCase().trim();
+    this.paginatedCurrencies = this.currencies.filter(currency =>
+      currency.value.toLowerCase().includes(term)
+    );
+    this.sortTable(this.sortColumn); // reapply sorting
+    this.updatePagination();
+  }
+
+  sortTable(column: string): void {
+    if (!column) return;
+
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+
+    this.paginatedCurrencies.sort((a, b) => {
+      const valueA = a[column as keyof InvoicingCurrency]?.toString().toLowerCase() || '';
+      const valueB = b[column as keyof InvoicingCurrency]?.toString().toLowerCase() || '';
+      return this.sortDirection === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
+    });
+
+    this.updatePagination();
+  }
+
+  updatePagination(): void {
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    const totalItems = this.paginatedCurrencies.length;
+    this.totalPages = Math.ceil(totalItems / this.pageSize);
+    this.paginatedCurrencies = this.paginatedCurrencies.slice(start, end);
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePagination();
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePagination();
+    }
   }
 }
