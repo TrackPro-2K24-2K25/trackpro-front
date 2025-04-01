@@ -1,0 +1,25 @@
+import { TimeUnit } from '../enums/time-unit.enum';
+
+export interface MissionSimple {
+  id: string;
+  title: string;
+  reference: string;
+  fees: number;
+  timeUnit: TimeUnit;
+  missionDuration: number;
+  startDate: string;
+  endDate: string;
+  nonRenewable: boolean;
+  finalClient: boolean;
+  invoiceRecipient: boolean;
+}
+
+export interface Mission extends MissionSimple {
+  companyId: string;
+  paymentTermId: string;
+  supplierAdminId: string;
+  collaborateurId?: string;
+  bankAccountId: string;
+  invoicingConditionId: string;
+  serviceContractId: string;
+}

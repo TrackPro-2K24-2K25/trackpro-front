@@ -1,0 +1,4 @@
+export enum CompanyType {
+    CLIENT_COMPANY = 'CLIENT_COMPANY',
+    SUPPLIER_COMPANY = 'SUPPLIER_COMPANY'
+}

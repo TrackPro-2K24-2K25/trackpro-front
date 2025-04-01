@@ -3,6 +3,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Company } from '../models/interfaces/company.interface';
+
+import { AppUser } from '../models/interfaces/user.interface';
+
+import { InvoicingConditions } from '../models/interfaces/invoicing-conditions.interface';
+
+import { PaymentTerm } from '../models/interfaces/payment-term.interface';
+
+import { InvoicingCurrency } from '../models/interfaces/invoicing-currency.interface';
+
 import { Observable, map } from 'rxjs';
 
 @Injectable({
@@ -54,4 +63,23 @@ export class CompanyService {
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+
+
+  getInvoicingConditions() {
+    return this.http.get<InvoicingConditions[]>('http://localhost:8081/api/v1/invoicing-conditions');
+  }
+  
+  getPaymentTerms() {
+    return this.http.get<PaymentTerm[]>('http://localhost:8081/api/v1/payment-terms');
+  }
+  
+  getInvoicingCurrencies() {
+    return this.http.get<InvoicingCurrency[]>('http://localhost:8081/api/v1/invoicing-currencies');
+  }
+  
+  getManagers() {
+    return this.http.get<AppUser[]>('http://localhost:8081/api/v1/users/all'); // or `/users/managers` if you filter only managers
+  }
+  
 }
