@@ -49,9 +49,9 @@ export class BankAccountsComponent implements OnInit, AfterViewInit {
       pays: '',
       companyType: '',
       creationDate: '',
-      NRCS: 0,
-      NIC: 0,
-      SIRET: 0,
+      nrcs: 0,
+      nic: 0,
+      siret: 0,
       vat: '',
       shareCapital: 0
     },
