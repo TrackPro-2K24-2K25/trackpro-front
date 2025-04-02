@@ -1,22 +1,179 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
 <div class="row">
-    <div class="col-sm-12">
-      <app-card cardTitle="Mission Management">
-        <p>Manage missions, update details, and upload PDF files.</p>
-  
-        <!-- Search Input and Add Button -->
+  <div class="col-sm-12">
+    <app-card cardTitle="Mission Management">
+      <p>Manage missions, update details, and upload PDF files.</p>
+
+      <!-- Search Input and Add Button -->
+      <div class="d-flex justify-content-between mb-2">
+        <input
+          type="text"
+          class="form-control me-2"
+          placeholder="Search..."
+          [(ngModel)]="searchTerm"
+          (input)="filterMissions()"
+        />
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMissionModal">
+          <i class="bi bi-plus-lg"></i>
+        </button>
         
+      </div>
 
-        <div class="d-flex justify-content-between mb-2">
-            <input type="text" class="form-control me-2" placeholder="Search..." >
-            <button type="button" class="btn btn-primary">
-              <i class="bi bi-plus-lg"></i>
-            </button>
+      <!-- Mission Table -->
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Reference</th>
+            <th>Fees</th>
+            <th>Duration</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="filteredMissions.length === 0">
+            <td colspan="7" class="text-center text-muted">
+              <i class="bi bi-emoji-frown"></i>
+              No missions yet. Please add one to get started!
+            </td>
+          </tr>
+          <tr *ngFor="let mission of filteredMissions">
+            <td>{{ mission.title }}</td>
+            <td>{{ mission.reference }}</td>
+            <td>{{ mission.fees }}</td>
+            <td>{{ mission.missionDuration }} {{ mission.timeUnit }}</td>
+            <td>{{ mission.startDate }}</td>
+            <td>{{ mission.endDate }}</td>
+            <td>
+              <button class="btn btn-outline-secondary btn-sm me-2">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-outline-danger btn-sm" (click)="deleteMission(mission.id)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </app-card>
+  </div>
+</div>
+
+<!-- Add Mission Modal -->
+<!-- Add Mission Modal -->
+<div class="modal fade" id="addMissionModal" tabindex="-1" aria-labelledby="addMissionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Mission</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label>Title</label>
+              <input type="text" class="form-control" [(ngModel)]="newMission.title" name="title" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Reference</label>
+              <input type="text" class="form-control" [(ngModel)]="newMission.reference" name="reference" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Fees</label>
+              <input type="number" class="form-control" [(ngModel)]="newMission.fees" name="fees">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Duration</label>
+              <input type="number" class="form-control" [(ngModel)]="newMission.missionDuration" name="duration">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Time Unit</label>
+              <select class="form-select" [(ngModel)]="newMission.timeUnit" name="timeUnit">
+                <option *ngFor="let unit of timeUnits" [value]="unit">{{ unit }}</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Start Date</label>
+              <input type="date" class="form-control" [(ngModel)]="newMission.startDate" name="startDate">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>End Date</label>
+              <input type="date" class="form-control" [(ngModel)]="newMission.endDate" name="endDate">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Company</label>
+              <select class="form-select" [(ngModel)]="newMission.companyId" name="companyId">
+                <option *ngFor="let company of companies" [value]="company.id">{{ company.name }}</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Payment Term</label>
+              <select class="form-select" [(ngModel)]="newMission.paymentTermId" name="paymentTermId">
+                <option *ngFor="let term of paymentTerms" [value]="term.id">{{ term.value }}</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Supplier Admin</label>
+              <select class="form-select" [(ngModel)]="newMission.supplierAdminId" name="supplierAdminId">
+                <option *ngFor="let user of users" [value]="user.id">{{ user.firstName }} {{ user.lastName }}</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Collaborateur</label>
+              <select class="form-select" [(ngModel)]="newMission.collaborateurId" name="collaborateurId">
+                <option *ngFor="let user of users" [value]="user.id">{{ user.firstName }} {{ user.lastName }}</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Bank Account</label>
+              <select class="form-select" [(ngModel)]="newMission.bankAccountId" name="bankAccountId">
+                <option *ngFor="let bank of bankAccounts" [value]="bank.id">{{ bank.accountNumber }}</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>Invoicing Condition</label>
+              <select class="form-select" [(ngModel)]="newMission.invoicingConditionId" name="invoicingConditionId">
+                <option *ngFor="let cond of invoicingConditions" [value]="cond.id">
+                  Term: {{ cond.paymentTerm?.value }} | Discount: {{ cond.discount }}%
+                </option>
+              </select>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+              <label>Service Contract</label>
+              <select class="form-select" [(ngModel)]="newMission.serviceContractId" name="serviceContractId">
+                <option *ngFor="let contract of serviceContracts" [value]="contract.id">
+                  {{ contract.reference }} - {{ contract.description }}
+                </option>
+              </select>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+              <label>Non-Renewable</label>
+              <input type="checkbox" class="form-check-input" [(ngModel)]="newMission.nonRenewable" name="nonRenewable">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Final Client</label>
+              <input type="checkbox" class="form-check-input" [(ngModel)]="newMission.finalClient" name="finalClient">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Invoice Recipient</label>
+              <input type="checkbox" class="form-check-input" [(ngModel)]="newMission.invoiceRecipient" name="invoiceRecipient">
+            </div>
           </div>
-       
-
-      </app-card>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" (click)="addMission()">Save Mission</button>
+      </div>
     </div>
   </div>
-  
+</div>
+
