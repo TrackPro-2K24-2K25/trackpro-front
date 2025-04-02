@@ -185,7 +185,53 @@ export class MissionsComponent implements OnInit {
     });
   }
   
+  editMission: {
+    id?: string;
+    fees?: number;
+    missionDuration?: number;
+    startDate?: string;
+    endDate?: string;
+  } = {};
   
+  
+  setEditMission(mission: MissionSimple): void {
+    this.editMission = {
+      id: mission.id,
+      fees: mission.fees,
+      missionDuration: mission.missionDuration,
+      startDate: mission.startDate,
+      endDate: mission.endDate
+    };
+  }
+
+  updateMission(): void {
+    if (!this.editMission.id) return;
+  
+    const payload = {
+      fees: this.editMission.fees,
+      missionDuration: this.editMission.missionDuration,
+      startDate: this.editMission.startDate,
+      endDate: this.editMission.endDate
+    };
+  
+    this.missionService.updateMission(this.editMission.id, payload).subscribe({
+      next: () => {
+        this.loadMissions();
+        Swal.fire('Success', 'Mission updated successfully!', 'success');
+  
+        // Close the modal
+        const modalEl = document.getElementById('editMissionModal');
+        if (modalEl) {
+          const modal = bootstrap.Modal.getInstance(modalEl);
+          modal?.hide();
+        }
+      },
+      error: () => {
+        Swal.fire('Error', 'Failed to update mission', 'error');
+      }
+    });
+  }
+
   
   
   

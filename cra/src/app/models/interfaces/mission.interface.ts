@@ -23,3 +23,11 @@ export interface Mission extends MissionSimple {
   invoicingConditionId: string;
   serviceContractId: string;
 }
+
+export interface UpdateMissionRequest {
+  fees: number;
+  missionDuration: number;
+  startDate: string;
+  endDate: string;
+}
+

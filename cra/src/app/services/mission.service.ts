@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { PaginatedResponse } from '../models/interfaces/paginated-response.interface';
+import { UpdateMissionRequest } from '../models/interfaces/mission.interface';
 
 export interface MissionSimple {
   id: string;
@@ -74,10 +75,10 @@ export class MissionService {
   /**
    * Update an existing mission.
    */
-  updateMission(id: string, mission: MissionFull): Observable<MissionFull> {
-    return this.http.put<MissionFull>(`${this.apiUrl}/${id}`, mission);
+  updateMission(id: string, payload: UpdateMissionRequest): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, payload);
   }
-
+  
   /**
    * Delete a mission by ID.
    */
