@@ -59,8 +59,12 @@ const routes: Routes = [
         loadComponent: () => import('./demo/others/timesheets/timesheets.component').then((c) => c.TimesheetsComponent)
       },
       {
-        path: 'companies',  
-        loadComponent: () => import('./demo/others/companies/companies.component').then((c) => c.CompaniesComponent)
+        path: 'expense-reports',  
+        loadComponent: () => import('./demo/others/expense-report/expense-report.component').then((c) => c.ExpenseReportComponent)
+      },
+      {
+        path: 'companies',
+        loadComponent: () => import('./demo/others/companies/companies.component').then((c) => c.CompanyComponent)
       },
       {
         path: 'missions',  
