@@ -28,11 +28,17 @@ export class ExpenseReportComponent implements OnInit {
 
   uploadedFiles: File[] = [];
 
+  // For create
   newReport: Partial<ExpenseReport> & {
     missionId?: string;
     collaborateurId?: string;
     managerId?: string;
   } = this.initNewReport();
+
+  // For edit
+  selectedReport?: ExpenseReport;
+  selectedStatus: Status = Status.PENDING;
+  Status = Status; // so you can use it in the template
 
   constructor(
     private expenseReportService: ExpenseReportService,
@@ -83,7 +89,7 @@ export class ExpenseReportComponent implements OnInit {
       mission: { id: this.newReport.missionId! } as any,
       collaborateur: { id: this.newReport.collaborateurId! } as any,
       manager: { id: this.newReport.managerId! } as any,
-      files: [] // You can push uploaded file references here once upload is integrated
+      files: []
     };
 
     this.expenseReportService.createReport(payload, this.uploadedFiles).subscribe({
@@ -98,6 +104,34 @@ export class ExpenseReportComponent implements OnInit {
         this.uploadedFiles = [];
       },
       error: () => Swal.fire('Error', 'Failed to create expense report', 'error')
+    });
+  }
+
+  openEditModal(report: ExpenseReport): void {
+    this.selectedReport = { ...report };
+    this.selectedStatus = report.status;
+
+    const modal = new bootstrap.Modal(document.getElementById('editExpenseReportModal')!);
+    modal.show();
+  }
+
+  updateReportStatus(): void {
+    if (!this.selectedReport) return;
+
+    const updatedReport: ExpenseReport = {
+      ...this.selectedReport,
+      status: this.selectedStatus
+    };
+
+    this.expenseReportService.updateReport(this.selectedReport.id, updatedReport).subscribe({
+      next: () => {
+        this.loadReports();
+        Swal.fire('Success', 'Status updated!', 'success');
+
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editExpenseReportModal')!);
+        modal?.hide();
+      },
+      error: () => Swal.fire('Error', 'Failed to update status', 'error')
     });
   }
 
