@@ -1,4 +1,5 @@
 import { TimeUnit } from '../enums/time-unit.enum';
+import { AppUser } from 'src/app/models/interfaces/user.interface';
 
 export interface MissionSimple {
   id: string;
@@ -29,5 +30,10 @@ export interface UpdateMissionRequest {
   missionDuration: number;
   startDate: string;
   endDate: string;
+}
+
+interface MissionExtended extends MissionSimple {
+  supplierAdmin?: AppUser;
+  collaborateur?: AppUser;
 }
 

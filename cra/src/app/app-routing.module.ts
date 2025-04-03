@@ -59,6 +59,10 @@ const routes: Routes = [
         loadComponent: () => import('./demo/others/timesheets/timesheets.component').then((c) => c.TimesheetsComponent)
       },
       {
+        path: 'create-timesheet',  
+        loadComponent: () => import('./demo/others/timesheets/create-timesheet/create-timesheet.component').then((c) => c.CreateTimesheetComponent)
+      },
+      {
         path: 'expense-reports',  
         loadComponent: () => import('./demo/others/expense-report/expense-report.component').then((c) => c.ExpenseReportComponent)
       },

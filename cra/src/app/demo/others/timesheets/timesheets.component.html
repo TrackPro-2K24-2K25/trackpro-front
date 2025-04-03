@@ -1,1 +1,105 @@
-<p>timesheets works!</p>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+<div class="row">
+  <div class="col-sm-12">
+    <app-card cardTitle="Timesheet Management">
+      <!-- Search + Add -->
+      <div class="d-flex justify-content-between mb-2">
+        <input type="text" class="form-control me-2" placeholder="Search by Collaborateur" [(ngModel)]="searchTerm" (input)="filterTimesheets()" />
+      </div>
+
+      <!-- Table -->
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th (click)="sortTable('collaborateur')">Collaborateur</th>
+            <th (click)="sortTable('manager')">Manager</th>
+            <th (click)="sortTable('date')">Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+            <tr *ngIf="paginatedTimesheets.length === 0">
+                <td colspan="5" class="text-center text-muted">No timesheets available.</td>
+              </tr>
+              
+          <tr *ngFor="let sheet of paginatedTimesheets">
+            <td>{{ sheet.collaborateur?.firstName }} {{ sheet.collaborateur?.lastName }}</td>
+            <td>{{ sheet.manager?.firstName }} {{ sheet.manager?.lastName }}</td>
+            <td>{{ sheet.date | date: 'yyyy-MM-dd' }}</td>
+            <td>{{ sheet.status }}</td>
+            <td>
+              <button class="btn btn-outline-secondary btn-sm me-2" (click)="openEditModal(sheet)">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-outline-primary btn-sm" (click)="openViewModal(sheet)">
+                <i class="bi bi-eye"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="d-flex justify-content-between align-items-center">
+        <button class="btn btn-outline-primary" [disabled]="currentPage === 1" (click)="previousPage()">← Previous</button>
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <button class="btn btn-outline-primary" [disabled]="currentPage === totalPages" (click)="nextPage()">Next →</button>
+      </div>
+    </app-card>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editTimesheetModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Update Status</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Date:</strong> {{ selectedTimesheet?.date | date }}</p>
+        <div class="mb-3">
+          <label>Status</label>
+          <select class="form-select" [(ngModel)]="selectedStatus">
+            <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" (click)="updateStatus()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Modal -->
+<div class="modal fade" id="viewTimesheetModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Timesheet Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedTimesheet">
+        <p><strong>Collaborateur:</strong> {{ selectedTimesheet.collaborateur?.firstName }} {{ selectedTimesheet.collaborateur?.lastName }}</p>
+        <p><strong>Manager:</strong> {{ selectedTimesheet.manager?.firstName }} {{ selectedTimesheet.manager?.lastName }}</p>
+        <p><strong>Date:</strong> {{ selectedTimesheet.date | date }}</p>
+        <p><strong>Status:</strong> {{ selectedTimesheet.status }}</p>
+
+        <h6>📁 Files</h6>
+        <ul>
+          <li *ngFor="let file of selectedTimesheet.files">
+            <a [href]="getFileUrl(file.url)" target="_blank">{{ file.name }}</a>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
