@@ -196,11 +196,11 @@
       <div class="modal-body">
         <div *ngIf="selectedReport">
           <p><strong>Description:</strong> {{ selectedReport.description }}</p>
-          <p><strong>Travel:</strong> {{ selectedReport.travelAmount }}</p>
-          <p><strong>Accommodation:</strong> {{ selectedReport.accommodationAmount }}</p>
-          <p><strong>Meal:</strong> {{ selectedReport.mealAmount }}</p>
-          <p><strong>Other:</strong> {{ selectedReport.otherAmount }}</p>
-          <p><strong>Total:</strong> {{ getTotal(selectedReport) }}</p>
+          <p><strong>Travel:</strong> {{ selectedReport.travelAmount }} $ </p>
+          <p><strong>Accommodation:</strong> {{ selectedReport.accommodationAmount }} $ </p>
+          <p><strong>Meal:</strong> {{ selectedReport.mealAmount }} $ </p>
+          <p><strong>Other:</strong> {{ selectedReport.otherAmount }} $ </p>
+          <p><strong>Total:</strong> {{ getTotal(selectedReport) }} $  </p>
           <p><strong>Status:</strong> {{ selectedReport.status }}</p>
           <p><strong>Mission:</strong> {{ selectedReport.mission?.title }}</p>
           <p><strong>Collaborateur:</strong> {{ selectedReport.collaborateur?.firstName }} {{ selectedReport.collaborateur?.lastName }}</p>
