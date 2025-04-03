@@ -173,4 +173,17 @@ export class ExpenseReportComponent implements OnInit {
       managerId: ''
     };
   }
+
+  // Removed duplicate declaration of selectedReport
+
+openViewModal(report: ExpenseReport): void {
+  this.selectedReport = report;
+  const modal = new bootstrap.Modal(document.getElementById('viewExpenseReportModal')!);
+  modal.show();
+}
+
+getFileUrl(filePath: string): string {
+  return `${filePath}`;
+}
+
 }

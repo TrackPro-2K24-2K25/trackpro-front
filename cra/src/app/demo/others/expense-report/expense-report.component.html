@@ -55,9 +55,9 @@
               <button class="btn btn-outline-secondary btn-sm me-2" (click)="openEditModal(report)">
                 <i class="bi bi-pencil"></i>
               </button>
-              <button class="btn btn-outline-danger btn-sm">
-                <i class="bi bi-trash"></i>
-              </button>
+              <button class="btn btn-outline-primary btn-sm" (click)="openViewModal(report)">
+                <i class="bi bi-eye"></i>
+              </button>              
             </td>
           </tr>
         </tbody>
@@ -173,6 +173,53 @@
       <div class="modal-footer">
         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button class="btn btn-success" (click)="updateReportStatus()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Report Modal -->
+<div
+  class="modal fade"
+  id="viewExpenseReportModal"
+  tabindex="-1"
+  aria-labelledby="viewModalTitle"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Expense Report Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div *ngIf="selectedReport">
+          <p><strong>Description:</strong> {{ selectedReport.description }}</p>
+          <p><strong>Travel:</strong> {{ selectedReport.travelAmount }}</p>
+          <p><strong>Accommodation:</strong> {{ selectedReport.accommodationAmount }}</p>
+          <p><strong>Meal:</strong> {{ selectedReport.mealAmount }}</p>
+          <p><strong>Other:</strong> {{ selectedReport.otherAmount }}</p>
+          <p><strong>Total:</strong> {{ getTotal(selectedReport) }}</p>
+          <p><strong>Status:</strong> {{ selectedReport.status }}</p>
+          <p><strong>Mission:</strong> {{ selectedReport.mission?.title }}</p>
+          <p><strong>Collaborateur:</strong> {{ selectedReport.collaborateur?.firstName }} {{ selectedReport.collaborateur?.lastName }}</p>
+          <p><strong>Manager:</strong> {{ selectedReport.manager?.firstName }} {{ selectedReport.manager?.lastName }}</p>
+          
+          <div *ngIf="selectedReport.files?.length">
+            <hr />
+            <h6>Files:</h6>
+            <ul>
+              <li *ngFor="let file of selectedReport.files">
+                <a [href]="getFileUrl(file.url)" target="_blank">{{ file.name }}</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
