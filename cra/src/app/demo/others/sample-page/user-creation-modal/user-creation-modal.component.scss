@@ -1,0 +1,79 @@
+.steps-container {
+    position: relative;
+    padding: 0 20px;
+    margin-bottom: 30px;
+  }
+  
+  .steps {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .progress-line {
+    position: absolute;
+    top: 24px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e9ecef;
+    z-index: 0;
+  }
+  
+  .step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+  }
+  
+  .step-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 8px;
+    border: 2px solid #e9ecef;
+  }
+  
+  .step-title {
+    font-size: 0.85rem;
+    color: #6c757d;
+    text-align: center;
+  }
+  
+  .step-item.active .step-circle {
+    background-color: #6f42c1;
+    color: white;
+    border-color: #6f42c1;
+  }
+  
+  .step-item.active .step-title {
+    color: #6f42c1;
+    font-weight: 600;
+  }
+  
+  .summary-section {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+  
+    h6 {
+      border-bottom: 1px solid #dee2e6;
+      padding-bottom: 8px;
+      margin-bottom: 15px;
+    }
+  }
+  
+  .form-step {
+    display: none;
+  
+    &.active {
+      display: block;
+    }
+  }
+  

@@ -1,0 +1,110 @@
+.steps-container {
+    position: relative;
+    padding: 0 20px;
+    margin-bottom: 30px;
+  
+    .steps {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      z-index: 2;
+    }
+  
+    .progress-line {
+      position: absolute;
+      top: 24px; // Aligns vertically with the step-circle center
+      left: 0;
+      right: 0;
+      height: 3px;
+      background-color: #dcdcdc; // Light grey
+      z-index: 1;
+  
+      .progress-line-fill {
+        height: 100%;
+        background-color: #286ba2;
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+    }
+  
+    .step-item {
+      flex: 1;
+      text-align: center;
+      position: relative;
+  
+      .step-circle {
+        width: 48px;
+        height: 48px;
+        line-height: 48px;
+        border-radius: 50%;
+        background-color: #e9ecef;
+        color: #6c757d;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin: 0 auto 8px;
+        border: 2px solid #e9ecef;
+        z-index: 3;
+        position: relative;
+      }
+  
+      .step-title {
+        font-size: 0.85rem;
+        color: #6c757d;
+      }
+  
+      &.active .step-circle {
+        background-color: #286ba2;
+        color: white;
+        border-color: #76b1e0;
+      }
+  
+      &.active .step-title {
+        color: #286ba2;
+        font-weight: 600;
+      }
+  
+      &.completed .step-circle {
+        background-color: #8abfeb; // lighter purple
+        color: #286ba2;
+        border-color: #286ba2;
+      }
+  
+      &.completed .step-title {
+        color: #286ba2;
+      }
+    }
+  }
+
+  .alert-info {
+    background-color: #b0dbff !important;
+    color: #000000 !important;
+    border-color: #3489cf !important;
+  }
+  
+  .summary-container {
+    text-align: left;
+    max-width: 600px;
+    margin: 0 auto;
+  
+    p {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      font-size: 1rem;
+  
+      strong {
+        font-size: 1.05rem;
+        min-width: 160px; // fixes label width
+        color: #333;
+      }
+  
+      // this targets the value text
+      &::after {
+        content: '';
+        margin-left: 12px;
+      }
+    }
+  }
+  

@@ -1,48 +1,56 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
 
 <div class="row">
   <div class="col-sm-12">
     <app-card cardTitle="User Management">
-      <p>
-        Welcome to the user management page. Here you can add, edit, and delete users.
-      </p>
+      <p>Welcome to the user management page. Here you can add, edit, and delete users.</p>
 
       <!-- Search Input and Add Button -->
       <div class="d-flex justify-content-between mb-2">
-        <input type="text" class="form-control me-2" placeholder="Search...">
-        <button type="button" class="btn btn-primary">
+        <input type="text" class="form-control me-2" placeholder="Search..." />
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#simpleModal">
           <i class="bi bi-plus-lg"></i>
         </button>
       </div>
-      
+
       <!-- User Table -->
       <table class="table table-striped">
         <thead>
           <tr>
             <th (click)="sortTable('firstName')">
-              First Name 
-              <i class="bi" [ngClass]="{'bi-arrow-up-short': sortColumn === 'firstName' && sortDirection === 'asc', 
-                                        'bi-arrow-down-short': sortColumn === 'firstName' && sortDirection === 'desc'}"></i>
+              First Name
+              <i class="bi" [ngClass]="{
+                'bi-arrow-up-short': sortColumn === 'firstName' && sortDirection === 'asc',
+                'bi-arrow-down-short': sortColumn === 'firstName' && sortDirection === 'desc'
+              }"></i>
             </th>
             <th (click)="sortTable('lastName')">
-              Last Name 
-              <i class="bi" [ngClass]="{'bi-arrow-up-short': sortColumn === 'lastName' && sortDirection === 'asc', 
-                                        'bi-arrow-down-short': sortColumn === 'lastName' && sortDirection === 'desc'}"></i>
+              Last Name
+              <i class="bi" [ngClass]="{
+                'bi-arrow-up-short': sortColumn === 'lastName' && sortDirection === 'asc',
+                'bi-arrow-down-short': sortColumn === 'lastName' && sortDirection === 'desc'
+              }"></i>
             </th>
             <th (click)="sortTable('email')">
-              Email 
-              <i class="bi" [ngClass]="{'bi-arrow-up-short': sortColumn === 'email' && sortDirection === 'asc', 
-                                        'bi-arrow-down-short': sortColumn === 'email' && sortDirection === 'desc'}"></i>
+              Email
+              <i class="bi" [ngClass]="{
+                'bi-arrow-up-short': sortColumn === 'email' && sortDirection === 'asc',
+                'bi-arrow-down-short': sortColumn === 'email' && sortDirection === 'desc'
+              }"></i>
             </th>
             <th (click)="sortTable('username')">
-              Username 
-              <i class="bi" [ngClass]="{'bi-arrow-up-short': sortColumn === 'username' && sortDirection === 'asc', 
-                                        'bi-arrow-down-short': sortColumn === 'username' && sortDirection === 'desc'}"></i>
+              Username
+              <i class="bi" [ngClass]="{
+                'bi-arrow-up-short': sortColumn === 'username' && sortDirection === 'asc',
+                'bi-arrow-down-short': sortColumn === 'username' && sortDirection === 'desc'
+              }"></i>
             </th>
             <th (click)="sortTable('role')">
-              Role 
-              <i class="bi" [ngClass]="{'bi-arrow-up-short': sortColumn === 'role' && sortDirection === 'asc', 
-                                        'bi-arrow-down-short': sortColumn === 'role' && sortDirection === 'desc'}"></i>
+              Role
+              <i class="bi" [ngClass]="{
+                'bi-arrow-up-short': sortColumn === 'role' && sortDirection === 'asc',
+                'bi-arrow-down-short': sortColumn === 'role' && sortDirection === 'desc'
+              }"></i>
             </th>
             <th>Actions</th>
           </tr>
@@ -55,17 +63,12 @@
             <td>{{ user.username }}</td>
             <td>{{ user.role }}</td>
             <td>
-              <!-- Edit Icon -->
               <button class="btn btn-outline-secondary btn-sm me-2" (click)="editUser(user)">
                 <i class="bi bi-pencil"></i>
               </button>
-            
-              <!-- Delete Icon -->
               <button class="btn btn-outline-secondary btn-sm me-2" (click)="deleteUser(user.id)">
                 <i class="bi bi-trash"></i>
               </button>
-            
-              <!-- Details Icon (Right Arrow) -->
               <button class="btn btn-outline-secondary btn-sm">
                 <i class="bi bi-chevron-right"></i>
               </button>
@@ -76,10 +79,179 @@
 
       <!-- Pagination Controls -->
       <div class="d-flex justify-content-between align-items-center">
-        <button class="btn btn-outline-primary" [disabled]="currentPage === 1" (click)="previousPage()">← Previous</button>
+        <button class="btn btn-outline-primary" [disabled]="currentPage === 1" (click)="previousPage()">←
+          Previous</button>
         <span>Page {{ currentPage }} of {{ totalPages }}</span>
-        <button class="btn btn-outline-primary" [disabled]="currentPage === totalPages" (click)="nextPage()">Next →</button>
+        <button class="btn btn-outline-primary" [disabled]="currentPage === totalPages" (click)="nextPage()">Next
+          →</button>
       </div>
     </app-card>
+  </div>
+</div>
+
+
+<!-- User Creation Modal -->
+<div class="modal fade" id="simpleModal" tabindex="-1" aria-labelledby="simpleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">User Creation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Progress Steps -->
+        <div class="steps-container mb-4">
+          <div class="steps d-flex justify-content-between">
+            <div class="step-item step-1" [ngClass]="{ 'active': currentStep === 1, 'completed': currentStep > 1 }">
+              <div class="step-circle">1</div>
+              <div class="step-title">General</div>
+            </div>
+            <div class="step-item step-2" [ngClass]="{ 'active': currentStep === 2, 'completed': currentStep > 2 }">
+              <div class="step-circle">2</div>
+              <div class="step-title">Contact</div>
+            </div>
+            <div class="step-item step-3" [ngClass]="{ 'active': currentStep === 3, 'completed': currentStep > 3 }">
+              <div class="step-circle">3</div>
+              <div class="step-title">Address</div>
+            </div>
+            <div class="step-item step-4" [ngClass]="{ 'active': currentStep === 4, 'completed': currentStep > 4 }">
+              <div class="step-circle">4</div>
+              <div class="step-title">Profile</div>
+            </div>
+            <div class="step-item step-5" [ngClass]="{ 'active': currentStep === 5, 'completed': currentStep > 5 }">
+              <div class="step-circle">5</div>
+              <div class="step-title">Review</div>
+            </div>
+          </div>
+          <div class="progress-line">
+            <div class="progress-line-fill" [style.width.%]="progressPercentage"></div>
+          </div>
+        </div>
+
+        <!-- Multi-Step Form -->
+        <form [formGroup]="userForm">
+          <ng-container *ngIf="currentStep === 1">
+            <!-- Step 1: General Info -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">First Name *</label>
+                <input formControlName="firstName" class="form-control" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Last Name *</label>
+                <input formControlName="lastName" class="form-control" />
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Email *</label>
+                <input type="email" formControlName="email" class="form-control" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Username *</label>
+                <input formControlName="username" class="form-control" />
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Password *</label>
+                <input type="password" formControlName="password" class="form-control" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Role *</label>
+                <select class="form-select" formControlName="role">
+                  <option value="">Select</option>
+                  <option value="ADMIN">ADMIN</option>
+                  <option value="MANAGER">MANAGER</option>
+                  <option value="SUPPLIER_ADMIN">SUPPLIER ADMIN</option>
+                  <option value="COLLABORATEUR">COLLABORATOR</option>
+                </select>
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="currentStep === 2">
+            <!-- Step 2: Contact -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Phone Number *</label>
+                <input formControlName="phoneNumber" class="form-control" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Alternative Email</label>
+                <input formControlName="alternativeEmail" class="form-control" />
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="currentStep === 3">
+            <!-- Step 3: Address -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Street Address *</label>
+                <input formControlName="streetAddress" class="form-control" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">City *</label>
+                <input formControlName="city" class="form-control" />
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">State *</label>
+                <input formControlName="state" class="form-control" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Country *</label>
+                <input formControlName="country" class="form-control" />
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="currentStep === 4">
+            <!-- Step 4: Profile -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Gender</label>
+                <select class="form-select" formControlName="gender">
+                  <option value="">Select</option>
+                  <option value="M">Male</option>
+                  <option value="F">Female</option>
+                  <option value="O">Other</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Date of Birth</label>
+                <input type="date" formControlName="dateOfBirth" class="form-control" />
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="currentStep === 5">
+            <!-- Step 5: Summary -->
+            <div class="alert alert-info custom-summary-alert">
+              Please review all the information before submitting.
+            </div>
+            <div *ngFor="let key of summaryKeys">
+              <p><b><strong>&nbsp;&nbsp;&nbsp;{{ key }}:&nbsp;&nbsp;</strong></b> {{ userForm.value[key] || 'Not
+                specified' }}</p>
+            </div>
+          </ng-container>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button *ngIf="currentStep > 1" class="btn" style="background-color: #286ba2; color: white; border: none;"
+          (click)="prevStep()">← Previous</button>
+
+        <button *ngIf="currentStep < 5" class="btn" style="background-color: #286ba2; color: white; border: none;"
+          (click)="nextStep()">Next →</button>
+
+        <button *ngIf="currentStep === 5" class="btn btn-success" (click)="submitUser()">Create</button>
+      </div>
+    </div>
   </div>
 </div>

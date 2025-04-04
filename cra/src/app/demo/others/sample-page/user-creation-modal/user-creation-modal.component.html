@@ -1,0 +1,209 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+<!-- user-creation-modal.component.html -->
+<div class="modal fade" id="userCreationModal" tabindex="-1" aria-labelledby="userCreationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="userCreationModalLabel">Création Utilisateur</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+  
+        <div class="modal-body">
+          <!-- Progress Steps -->
+          <div class="steps-container mb-4">
+            <div class="steps d-flex justify-content-between">
+              <div class="step-item step-1 active">
+                <div class="step-circle">1</div>
+                <div class="step-title">Informations générales</div>
+              </div>
+              <div class="step-item step-2">
+                <div class="step-circle">2</div>
+                <div class="step-title">Contact</div>
+              </div>
+              <div class="step-item step-3">
+                <div class="step-circle">3</div>
+                <div class="step-title">Adresse</div>
+              </div>
+              <div class="step-item step-4">
+                <div class="step-circle">4</div>
+                <div class="step-title">Profil</div>
+              </div>
+              <div class="step-item step-5">
+                <div class="step-circle">5</div>
+                <div class="step-title">Validation</div>
+              </div>
+            </div>
+            <div class="progress-line"></div>
+          </div>
+  
+          <!-- FORM -->
+          <form id="userForm">
+            <!-- STEP 1 -->
+            <div class="form-step step-1-content active">
+              <h6>Informations de base</h6>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Prénom *</label>
+                  <input type="text" class="form-control" id="firstName" required />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Nom *</label>
+                  <input type="text" class="form-control" id="lastName" required />
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Email *</label>
+                  <input type="email" class="form-control" id="email" required />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Nom d'utilisateur *</label>
+                  <input type="text" class="form-control" id="username" required />
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Mot de passe</label>
+                  <input type="password" class="form-control" id="password" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Rôle *</label>
+                  <select class="form-select" id="role" required>
+                    <option value="">Sélectionner un rôle</option>
+                    <option value="ADMIN">ADMIN</option>
+                    <option value="MANAGER">MANAGER</option>
+                    <option value="SUPPLIER_ADMIN">SUPPLIER_ADMIN</option>
+                    <option value="COLLABORATEUR">COLLABORATEUR</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+  
+            <!-- STEP 2 -->
+            <div class="form-step step-2-content">
+              <h6>Contact</h6>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Téléphone *</label>
+                  <input type="text" class="form-control" id="phoneNumber" required />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Email alternatif</label>
+                  <input type="email" class="form-control" id="alternativeEmail" />
+                </div>
+              </div>
+            </div>
+  
+            <!-- STEP 3 -->
+            <div class="form-step step-3-content">
+              <h6>Adresse</h6>
+              <div class="mb-3">
+                <label class="form-label">Adresse *</label>
+                <input type="text" class="form-control" id="streetAddress" required />
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Ville *</label>
+                  <input type="text" class="form-control" id="city" required />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">État/Province *</label>
+                  <input type="text" class="form-control" id="state" required />
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Code postal *</label>
+                  <input type="text" class="form-control" id="postalCode" required />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Pays *</label>
+                  <input type="text" class="form-control" id="country" required />
+                </div>
+              </div>
+            </div>
+  
+            <!-- STEP 4 -->
+            <div class="form-step step-4-content">
+              <h6>Profil</h6>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Photo de profil</label>
+                  <input type="text" class="form-control" id="profilePictureUrl" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Site web</label>
+                  <input type="text" class="form-control" id="website" />
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Genre</label>
+                  <select class="form-select" id="gender">
+                    <option value="">Sélectionner</option>
+                    <option value="M">Masculin</option>
+                    <option value="F">Féminin</option>
+                    <option value="O">Autre</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Date de naissance</label>
+                  <input type="date" class="form-control" id="dateOfBirth" />
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Biographie</label>
+                <textarea class="form-control" id="bio" rows="3"></textarea>
+              </div>
+            </div>
+  
+            <!-- STEP 5 -->
+            <div class="form-step step-5-content">
+              <h6>Validation</h6>
+              <div class="alert alert-info">
+                Veuillez vérifier les informations avant de créer l'utilisateur.
+              </div>
+  
+              <div class="summary-section mb-3">
+                <h6>Informations de base</h6>
+                <p><strong>Prénom:</strong> <span id="summary-firstName"></span></p>
+                <p><strong>Nom:</strong> <span id="summary-lastName"></span></p>
+                <p><strong>Email:</strong> <span id="summary-email"></span></p>
+                <p><strong>Nom d'utilisateur:</strong> <span id="summary-username"></span></p>
+                <p><strong>Rôle:</strong> <span id="summary-role"></span></p>
+              </div>
+  
+              <div class="summary-section mb-3">
+                <h6>Contact et Adresse</h6>
+                <p><strong>Téléphone:</strong> <span id="summary-phoneNumber"></span></p>
+                <p><strong>Email alternatif:</strong> <span id="summary-alternativeEmail">Non spécifié</span></p>
+                <p><strong>Adresse:</strong> <span id="summary-streetAddress"></span></p>
+                <p><strong>Ville:</strong> <span id="summary-city"></span>, 
+                   <span id="summary-state"></span> 
+                   <span id="summary-postalCode"></span></p>
+                <p><strong>Pays:</strong> <span id="summary-country"></span></p>
+              </div>
+  
+              <div class="summary-section">
+                <h6>Profil</h6>
+                <p><strong>Genre:</strong> <span id="summary-gender">Non spécifié</span></p>
+                <p><strong>Date de naissance:</strong> <span id="summary-dateOfBirth">Non spécifiée</span></p>
+                <p><strong>Site web:</strong> <span id="summary-website">Non spécifié</span></p>
+                <p><strong>Biographie:</strong> <span id="summary-bio">Non spécifiée</span></p>
+              </div>
+            </div>
+          </form>
+        </div>
+  
+        <!-- Footer Buttons -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ANNULER</button>
+          <button id="prevBtn" type="button" class="btn btn-outline-primary" (click)="prevStep()">PRÉCÉDENT</button>
+          <button id="nextBtn" type="button" class="btn btn-primary" (click)="nextStep()">SUIVANT</button>
+          <button id="createBtn" type="button" class="btn btn-success" (click)="createUser()">CRÉER</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
